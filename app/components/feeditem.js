@@ -71,7 +71,7 @@ didUserLike() {
     var data = this.state;
     var contents;
 
-    if (this.didUserLike()) {
+    if(this.didUserLike()) {
       likeButtonText = "Unlike";
     }
 
@@ -127,10 +127,10 @@ didUserLike() {
         <hr />
         <CommentThread onPost={(commentText) => this.handleCommentPost(commentText)}>
           {
-            data.comments.map((comment, i) => {
+            data.comments.map((comment,i) => {
               // i is comment's index in comments array
               return (
-                <Comment key={i} author={comment.author} postDate={comment.postDate}>{comment.contents}</Comment>
+                <Comment key={i} id={i} author={comment.author} postDate={comment.postDate} likeCounter={comment.likeCounter} owner={data._id}>{comment.contents}</Comment>
               );
             })
           }

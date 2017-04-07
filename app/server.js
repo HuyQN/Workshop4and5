@@ -70,26 +70,26 @@ export function postStatusUpdate(user, location, contents, cb) {
       "postDate": time,
       "location": location,
       "contents": contents
-    },
-    // List of comments on the post
-    "comments": []
-  };
+      },
+      // List of comments on the post
+      "comments": []
+    };
 
-  // Add the status update to the database.
-  // Returns the status update w/ an ID assigned.
-  newStatusUpdate = addDocument('feedItems', newStatusUpdate);
+    // Add the status update to the database.
+    // Returns the status update w/ an ID assigned.
+    newStatusUpdate = addDocument('feedItems', newStatusUpdate);
 
-  // Add the status update reference to the front of the current user's feed.
-  var userData = readDocument('users', user);
-  var feedData = readDocument('feeds', userData.feed);
-  feedData.contents.unshift(newStatusUpdate._id);
+    // Add the status update reference to the front of the current user's feed.
+    var userData = readDocument('users', user);
+    var feedData = readDocument('feeds', userData.feed);
+    feedData.contents.unshift(newStatusUpdate._id);
 
-  // Update the feed object.
-  writeDocument('feeds', feedData);
+    // Update the feed object.
+    writeDocument('feeds', feedData);
 
-  // Return the newly-posted object.
-  emulateServerReturn(newStatusUpdate, cb);
-}
+    // Return the newly-posted object.
+    emulateServerReturn(newStatusUpdate, cb);
+  }
 
 /**
  * Adds a new comment to the database on the given feed item.
@@ -104,7 +104,8 @@ export function postComment(feedItemId, author, contents, cb) {
   feedItem.comments.push({
     "author": author,
     "contents": contents,
-    "postDate": new Date().getTime()
+    "postDate": new Date().getTime(),
+    "likeCounter": []
   });
   writeDocument('feedItems', feedItem);
   // Return a resolved version of the feed item so React can
@@ -145,4 +146,21 @@ export function unlikeFeedItem(feedItemId, userId, cb) {
   }
   // Return a resolved version of the likeCounter
   emulateServerReturn(feedItem.likeCounter.map((userId) => readDocument('users', userId)), cb);
+}
+
+export function likeComment(feedItemId, commentIndex, userId,cb){
+  var feedItem = readDocument('feedItems',feedItemId);
+  feedItem.comments[commentIndex].likeCounter.push(userId);
+  writeDocument('feedItems',feedItem);
+  emulateServerReturn(feedItem.comments[commentIndex].likeCounter.map((userId) => readDocument('users', userId)), cb);
+}
+
+export function unlikeComment(feedItemId, commentIndex, userId,cb){
+  var feedItem = readDocument('feedItems',feedItemId);
+  var userIndex = feedItem.comments[commentIndex].likeCounter.indexOf(userId);
+  if(userIndex !== -1){
+    feedItem.comments[commentIndex].likeCounter.splice(userIndex,1);
+    writeDocument('feedItems',feedItem);
+  }
+  emulateServerReturn(feedItem.comments[commentIndex].likeCounter.map((userId) => readDocument('users', userId)), cb);
 }
