@@ -2,7 +2,7 @@ import React from 'react';
 import CommentEntry from './commententry';
 
 export default class CommentThread extends React.Component {
-  render(){
+  render() {
     return (
       <ul className="media-list">
         {React.Children.map(this.props.children, function(child) {
@@ -11,9 +11,9 @@ export default class CommentThread extends React.Component {
               {child}
             </li>
           )
-        } ) }
+        })}
         <li className="media">
-          <CommentEntry />
+          <CommentEntry onPost={this.props.onPost} />
         </li>
       </ul>
     )
